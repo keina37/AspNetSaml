@@ -77,17 +77,20 @@ namespace Saml
                 return false;
 
             var reference = (Reference)signedXml.SignedInfo.References[0];
-            var id = reference.Uri.Substring(1);
-
-            var idElement = signedXml.GetIdElement(_xmlDoc, id);
-
-            if (idElement == _xmlDoc.DocumentElement)
-                return true;
-            else //sometimes its not the "root" doc-element that is being signed, but the "assertion" element
+            if (!string.IsNullOrEmpty(reference?.Uri)) //Reference URI=""ÇÃèÍçáÇÕrootóvëfÇ÷ÇÃéQè∆Ç∆å©Ç»Ç∑
             {
-                var assertionNode = _xmlDoc.SelectSingleNode("/samlp:Response/saml:Assertion", _xmlNameSpaceManager) as XmlElement;
-                if (assertionNode != idElement)
-                    return false;
+                var id = reference.Uri.Substring(1);
+
+                var idElement = signedXml.GetIdElement(_xmlDoc, id);
+
+                if (idElement == _xmlDoc.DocumentElement)
+                    return true;
+                else //sometimes its not the "root" doc-element that is being signed, but the "assertion" element
+                {
+                    var assertionNode = _xmlDoc.SelectSingleNode("/samlp:Response/saml:Assertion", _xmlNameSpaceManager) as XmlElement;
+                    if (assertionNode != idElement)
+                        return false;
+                }
             }
 
             return true;
