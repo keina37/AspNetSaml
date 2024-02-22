@@ -1,5 +1,53 @@
-![](https://github.com/jitbit/AspNetSaml/actions/workflows/dotnet.yml/badge.svg)
+# このリポジトリについて
+このリポジトリは、
+[https://github.com/jitbit/AspNetSaml](https://github.com/jitbit/AspNetSaml)
+をフォークしたリポジトリです。
 
+# フォークした理由と目的
+Signature Reference URI=""となっているSAML Responseを返却するIdpに対応するための修正を行います。
+フォーク元のライブラリではReference URIが空であることを考慮しておらず、修正しないままではArgumentOutOfRangeExceptionの例外が発生します。
+
+ただし、この修正が本来必要なものなのかはよくわかりません。
+Idpとフォーク元のどちらの実装が仕様上正しいのか、確信が持てていません。（どなたか教えてくだされば幸いです）
+
+oasisが公開している[SAMLの仕様](https://wiki.oasis-open.org/security/FrontPage)では以下のように説明されています。（2024年2月22日現在、coreの仕様書がNotFoundになっていました）
+>5.4.2 References
+>SAML assertions and protocol messages MUST supply a value for the ID attribute on the root element of
+the assertion or protocol message being signed. The assertion’s or protocol message's root element may
+or may not be the root element of the actual XML document containing the signed assertion or protocol
+message (e.g., it might be contained within a SOAP envelope).
+Signatures MUST contain a single <ds:Reference> containing a same-document reference to the ID
+attribute value of the root element of the assertion or protocol message being signed. For example, if the
+ID attribute value is "foo", then the URI attribute in the <ds:Reference> element MUST be "#foo".
+
+（英語が苦手なので）後半部分を機械翻訳にかけると、以下の翻訳結果になりました。
+>署名には、<ds:Reference>を1つ含めなければならない(MUST)。
+属性値への同一文書参照を含む単一の<ds:Reference>を含まなければならない。例えば
+ID 属性値が "foo" の場合、<ds:Reference> 要素の URI 属性は "#foo" でなければならない (MUST)。
+
+Reference URI=""ではいけないように読めます。
+
+しかし、W3Cの[XMLデジタル署名の仕様](https://www.w3.org/TR/xmldsig-core/)
+のexample23では以下のように説明されています。
+>Due to the null Reference URI in this example, the XPath transform input node-set contains all nodes in the entire parse tree starting at the root node (except the comment nodes). For each node in this node-set, the node is included in the output node-set except if the node or one of its ancestors has a tag of Signature that is in the namespace given by the replacement text for the entity &dsig;.
+
+前半部分を機械翻訳にかけると、以下の翻訳結果になりました。
+>この例では参照 URI が NULL のため、XPath 変換の入力ノードセットには、ルートノードから始まる解析ツリー全体 のすべてのノードが含まれます（コメントノードを除く）。
+
+Reference URI=""の場合は、ルートノードから始まる解析ツリー全体の全てのノードが含まれると書かれています。（＝ルートへの参照と見なしてかまわない？）
+
+よって、
+
+- SAMLはXMLデジタル署名を利用しているので、Reference URI=""を許容する（oasisのSAML仕様書では説明を省いていて典型的なケースについてだけ記載しているのかもしれない）
+- あくまでSAMLはSAML仕様書の記載に従うべきと考えて、Reference URI=""を許容しない
+
+どちらの立場も一理あるように思えます。
+
+Idp側の修正が望めない場合のために、ライブラリを一部修正します。
+
+以下はフォーク元のreadmeです。
+
+<!--![](https://github.com/jitbit/AspNetSaml/actions/workflows/dotnet.yml/badge.svg)-->
 # AspNetSaml
 
 Very short and simple SAML 2.0 "consumer" implementation in C#.
