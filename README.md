@@ -25,7 +25,7 @@ ID attribute value is "foo", then the URI attribute in the <ds:Reference> elemen
 属性値への同一文書参照を含む単一の<ds:Reference>を含まなければならない。例えば
 ID 属性値が "foo" の場合、<ds:Reference> 要素の URI 属性は "#foo" でなければならない (MUST)。
 
-Reference URI=""ではいけないように読めます。
+Reference URI=""ではいけないようにも読めます。
 
 しかし、W3Cの[XMLデジタル署名の仕様](https://www.w3.org/TR/xmldsig-core/)
 のexample23では以下のように説明されています。
