@@ -77,7 +77,7 @@ namespace Saml
                 return false;
 
             var reference = (Reference)signedXml.SignedInfo.References[0];
-            if (!string.IsNullOrEmpty(reference?.Uri)) //Reference URI=""‚Ìê‡‚Íroot—v‘f‚Ö‚ÌQÆ‚ÆŒ©‚È‚·
+            if (!string.IsNullOrEmpty(reference?.Uri)) //Reference URI=""ï¿½Ìê‡ï¿½ï¿½rootï¿½vï¿½fï¿½Ö‚ÌQï¿½Æ‚ÆŒï¿½ï¿½È‚ï¿½
             {
                 var id = reference.Uri.Substring(1);
 
